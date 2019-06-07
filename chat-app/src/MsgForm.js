@@ -9,15 +9,21 @@ class MsgForm extends React.Component {
         nickname: '',
     };
 
-    this.props.socket.on('NICKNAME', (data) => {
-       this.setState({nickname: data.nickname});
+    this.props.socket.on('NICKNAME_SET', (data) => {
+       this.setState({nickname: data});
+       //this.props.handleNickname(this.state.nickname);
     });
-
+    
     this.sendMessage = ev => {
         ev.preventDefault();
         this.props.socket.emit('SEND_MESSAGE', {
-            author: this.state.nickname ? this.state.nickname : this.props.username,
+            //author: this.state.nickname ? this.state.nickname : this.props.username,
+            author: {
+                username: this.props.username,
+                nickname: this.state.nickname
+            },
             message: this.state.message,
+            channel: this.props.activChannel
         });
         this.setState({message: ''});
     }
@@ -26,8 +32,10 @@ class MsgForm extends React.Component {
   render(){
     return (
         <div>
-            <input type="text" placeholder="Message" value={this.state.message} onChange={ev => this.setState({message: ev.target.value})} className="form-control"/>
-            <button onClick={this.sendMessage} className="btn btn-success form-control">Send</button>
+            <form onSubmit={this.sendMessage}>
+                <input type="text" placeholder="Message" value={this.state.message} onChange={ev => this.setState({message: ev.target.value})} className="form-control"/>
+                <button onClick={this.sendMessage} type="submit" className="btn btn-success form-control">Send</button>
+            </form>
         </div>
     );
   }

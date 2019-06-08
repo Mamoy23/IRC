@@ -1,4 +1,5 @@
 import React from 'react';
+import EmojiPicker from 'emoji-picker-react';
 
 class MsgForm extends React.Component {
   constructor(props){
@@ -7,17 +8,16 @@ class MsgForm extends React.Component {
     this.state = {
         message: '',
         nickname: '',
+        showEmoji : false
     };
 
     this.props.socket.on('NICKNAME_SET', (data) => {
        this.setState({nickname: data});
-       //this.props.handleNickname(this.state.nickname);
     });
     
     this.sendMessage = ev => {
         ev.preventDefault();
         this.props.socket.emit('SEND_MESSAGE', {
-            //author: this.state.nickname ? this.state.nickname : this.props.username,
             author: {
                 username: this.props.username,
                 nickname: this.state.nickname
@@ -29,12 +29,35 @@ class MsgForm extends React.Component {
     }
   }
 
+  addEmoji = (e) => {
+    let emoji = String.fromCodePoint(`0x${e}`)
+    this.setState({message: this.state.message + emoji})
+  }
+
+  showEmoji = (e) => {
+    if(this.state.showEmoji === false)
+        this.setState({showEmoji: true})
+    else
+        this.setState({showEmoji: false})
+  }
+
   render(){
     return (
         <div>
             <form onSubmit={this.sendMessage}>
-                <input type="text" placeholder="Message" value={this.state.message} onChange={ev => this.setState({message: ev.target.value})} className="form-control"/>
-                <button onClick={this.sendMessage} type="submit" className="btn btn-success form-control">Send</button>
+                <div className="input-group m-1">                
+                    <div className="input-group-prepend">
+                        <span className="input-group-text" onClick={this.showEmoji}>{String.fromCodePoint(`0x1f642`)}</span>
+                    </div>
+                    <input type="text" placeholder="Message" value={this.state.message} onChange={ev => this.setState({message: ev.target.value})} className="form-control"/>
+                    <div className="input-group-append">
+                        <button onClick={this.sendMessage} type="submit" className="btn btn-dark form-control">Send</button>
+                    </div>
+                </div>
+                {this.state.showEmoji ? 
+                    <EmojiPicker className="emojis" onEmojiClick={this.addEmoji}/> : 
+                    null
+                }
             </form>
         </div>
     );

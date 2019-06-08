@@ -9,7 +9,6 @@ io.on('connection', (socket) => {
 
   socket.on('USER', function(user){
     users[user] = {id: socket.id, nick: ''};
-    console.log(users);
     socket.on('disconnect', function(){
       delete users[user];
     })
@@ -19,19 +18,21 @@ io.on('connection', (socket) => {
     var msg = data.message;
     var cmd = msg.split(' ');
     var channel = data.channel;
-    var nickname = data.author.nickname;
+    //var nickname = data.author.nickname;
     var username = data.author.username;
 
     switch (true){
       case msg.startsWith('/nick'):
-        users[username].nick = cmd[1];
-        //io.emit('NICKNAME', { username: username, nickname: cmd[1] });
+      users[username].nick = cmd[1];
         io.emit('RESPONSE', username+' is now nicknamed '+cmd[1]);
         socket.emit('NICKNAME_SET', users[username].nick);
         break;
       case msg.startsWith('/users'):
         var result = rooms[channel];
-        socket.emit('USERS', result);
+        if(result)
+          socket.emit('USERS', result);
+        else 
+          socket.emit('RESPONSE', 'Please join a channel before');
         break;
       case msg.startsWith('/create'):
         socket.join(cmd[1], function(){
@@ -42,22 +43,25 @@ io.on('connection', (socket) => {
         });
         break;
       case msg.startsWith('/join'):
-        if(cmd[1] in rooms){
-          socket.join(cmd[1]);
-          socket.emit('CHANGE_CHANNEL', cmd[1]);
-          if(rooms[cmd[1]].includes(username) === false){
-            rooms[cmd[1]].push(username);
+        if(cmd[1]){
+          if(cmd[1] in rooms){
+            socket.join(cmd[1]);
+            socket.emit('CHANGE_CHANNEL', cmd[1]);
+            if(rooms[cmd[1]].includes(username) === false){
+              rooms[cmd[1]].push(username);
+            }
+            io.in(cmd[1]).emit('RESPONSE', username+' join channel '+cmd[1]);
+            io.emit('ROOMS', rooms);
           }
-          io.in(cmd[1]).emit('RESPONSE', username+' join channel '+cmd[1]);
-          io.emit('ROOMS', rooms);
+          else{
+            socket.emit('RESPONSE', 'No channel found for '+cmd[1]);
+          }
         }
-        else{
-          socket.emit('RESPONSE', 'No channel found for '+cmd[1]);
+        else {
+          socket.emit('RESPONSE', 'No channel');
         }
-        console.log(rooms);
         break;
       case msg.startsWith('/list'):
-        console.log(rooms);
         if(Object.keys(rooms).length > 0){
           if(cmd[1]){
             var result = {};
@@ -113,13 +117,15 @@ io.on('connection', (socket) => {
       case msg.startsWith('/msg'):
         let receiver = cmd[1];
         if(users[receiver]){
-          socket.join(receiver);
-          socket.emit('CHANGE_CHANNEL', receiver);
-          rooms[receiver] = [username, receiver];
+          socket.join(receiver+'<->'+username);
+          rooms[receiver+'<->'+username] = [username, receiver];
+          socket.emit('CHANGE_CHANNEL', receiver+'<->'+username);
           cmd.splice(0, 2);
           let privateMsg = cmd.join(' ');
           console.log(privateMsg);
           socket.to(users[receiver].id).emit('RECEIVE_MESSAGE', privateMsg);
+          socket.to(users[username].id).emit('RECEIVE_MESSAGE', privateMsg);
+          io.emit('ROOMS', rooms);
         }
         else{
           socket.emit('RESPONSE', 'No user found for '+cmd[1]);

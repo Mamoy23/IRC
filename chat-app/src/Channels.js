@@ -24,9 +24,9 @@ class Channels extends React.Component{
     }
     render(){
         return (
-            <div className="container">
+            <div className="container w-100">
                 <ul className="list-group">
-                    <li className="list-group-item list-group-item-light">Channels</li>
+                    <li className="list-group-item channels">Channels</li>
                     {Object.keys(this.state.rooms)
                     .filter(room => this.state.rooms[room].includes(this.props.username))
                     .map((room, i) => 

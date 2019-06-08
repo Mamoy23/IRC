@@ -20,10 +20,11 @@ class Login extends React.Component {
 
   render(){
     return (
-      <div className="container">
+      <div className="container m-4">
+        <h1 className="text-dark">Internet Relay Chat</h1>
         <form onSubmit={this.handleSubmit}> 
             <input type="text" placeholder="Username" value={this.state.username} onChange={ev => this.setState({username: ev.target.value})} className="form-control"/>
-            <input className="btn btn-success" type="submit" value="Login" />
+            <input className="btn btn-dark w-100" type="submit" value="Login" />
         </form>
       </div>
     );

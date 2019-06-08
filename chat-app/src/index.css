@@ -1,13 +1,33 @@
+@import url('https://fonts.googleapis.com/css?family=Raleway&display=swap');
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+  /* font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+    sans-serif; */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: 'Raleway', sans-serif;
+  height: 100vh;
+  background-color: tan;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+.emoji-picker {
+  position: absolute !important;
+}
+
+.card-body {
+  background-color: #daa52017;
+}
+.card-footer {
+  background-color: #505050;
+}
+
+.input-group-text {
+  background-color: #fff;
 }

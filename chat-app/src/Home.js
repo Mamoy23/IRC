@@ -35,11 +35,11 @@ class Home extends React.Component{
     render(){
         return (
             <div className="container d-flex">
-                <div className="card">
+                <div className="card col-12 p-0">
                     <div className="card-body">
                         <div className="card-title">
-                            <h1>Welcome {this.props.username}</h1>
-                            <h2>{this.state.activChannel}</h2>
+                            <h1 className="text-center">Welcome {this.props.username}</h1>
+                            <h3># {this.state.activChannel}</h3>
                         </div>
                         <hr/>
                         <Messages 
